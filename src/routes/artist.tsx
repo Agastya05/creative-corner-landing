@@ -431,3 +431,124 @@ function ExhibitionList({
     </div>
   );
 }
+
+/* ---------------------- ARTWORK FOR SALE ---------------------- */
+const MEDIUMS = ["Mixed Media", "Acrylic", "Oil on Canvas", "Watercolor", "Ink & Gouache"];
+const PALETTES = [
+  ["#C2410C", "#1F2937"],
+  ["#0F3460", "#E94560"],
+  ["#7C2D12", "#FBBF24"],
+  ["#064E3B", "#A7F3D0"],
+  ["#312E81", "#F472B6"],
+  ["#7F1D1D", "#FDE68A"],
+  ["#1E3A8A", "#FCA5A5"],
+  ["#365314", "#FDE047"],
+  ["#581C87", "#FB7185"],
+  ["#9A3412", "#FECACA"],
+];
+const NAMES = [
+  "Chromatic Harmony","Color Cascade","Abstract Dreams","Geometric Bliss","Vibrant Energy",
+  "Monsoon Memory","Saffron Drift","Indigo Tide","Ember Field","Quiet Bloom",
+  "Velvet Static","Marigold Hours","Crimson Loop","Pale Horizon","Inner Weather",
+  "Mira's Garden","Echo Chamber","Salt & Gold","Bandra Light","After Rain",
+  "Brass Sun","Soft Riot","Slow River","Heat Map","Paper Sky",
+  "Folded Light","Quiet Noise","Tilted Room","Pink Static","Long Afternoon",
+  "Borrowed Blue","Open Window","Half Moon","Untitled No. 7","Untitled No. 12",
+  "Untitled No. 19","First Light","Last Light","Studio Floor","Held Breath",
+  "Soft Architecture","Conversation","Two Reds","Three Blues","Field Notes",
+  "Migration","Citrine","Ferment","Ochre Study","Closing Tide",
+];
+
+function makeArtwork(i: number) {
+  const palette = PALETTES[i % PALETTES.length];
+  return {
+    id: i,
+    name: NAMES[i % NAMES.length],
+    medium: MEDIUMS[i % MEDIUMS.length],
+    price: 18000 + ((i * 1373) % 22000),
+    palette,
+  };
+}
+
+const ALL_ARTWORKS = Array.from({ length: 50 }, (_, i) => makeArtwork(i));
+
+function ArtworkForSale() {
+  const [expanded, setExpanded] = useState(false);
+  const items = expanded ? ALL_ARTWORKS : ALL_ARTWORKS.slice(0, 5);
+
+  return (
+    <section
+      aria-labelledby="shop-heading"
+      className="bg-[var(--cream)] text-[var(--ink)]"
+    >
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+        <div className="text-center">
+          <p className="text-[0.7rem] tracking-[0.4em] uppercase text-[var(--ochre-deep)]">
+            Collection
+          </p>
+          <h2
+            id="shop-heading"
+            className="mt-4 font-display text-5xl md:text-7xl text-[var(--ink)]"
+          >
+            Artwork <span className="italic text-[var(--ochre-deep)]">for Sale</span>
+          </h2>
+          <p className="mt-3 text-[0.7rem] tracking-[0.4em] uppercase text-[var(--ink)]/60">
+            Original Pieces · Priya Desai
+          </p>
+        </div>
+
+        <ul className="mt-16 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {items.map((a) => (
+            <li key={a.id} className="group flex flex-col">
+              <div
+                className="relative aspect-[3/4] w-full overflow-hidden"
+                style={{
+                  background: `linear-gradient(135deg, ${a.palette[0]} 0%, ${a.palette[1]} 100%)`,
+                }}
+                role="img"
+                aria-label={`${a.name} — ${a.medium}`}
+              >
+                <div
+                  aria-hidden
+                  className="absolute inset-0 mix-blend-overlay opacity-60"
+                  style={{
+                    background:
+                      "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.5), transparent 50%), radial-gradient(circle at 70% 80%, rgba(0,0,0,0.4), transparent 55%)",
+                  }}
+                />
+                <button
+                  type="button"
+                  className="absolute bottom-3 right-3 bg-[var(--ink)] px-4 py-2 text-[0.6rem] tracking-[0.3em] uppercase text-[var(--cream)] opacity-0 transition group-hover:opacity-100"
+                >
+                  View
+                </button>
+              </div>
+              <div className="mt-4">
+                <h3 className="font-display italic text-lg text-[var(--ink)]">
+                  {a.name}
+                </h3>
+                <p className="mt-1 text-[0.6rem] tracking-[0.3em] uppercase text-[var(--ochre-deep)]">
+                  {a.medium}
+                </p>
+                <p className="mt-2 font-display text-sm text-[var(--ink)]">
+                  ₹{a.price.toLocaleString("en-IN")}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-16 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            aria-expanded={expanded}
+            className="bg-[var(--ink)] px-10 py-5 text-[0.7rem] tracking-[0.4em] uppercase text-[var(--cream)] transition hover:bg-[var(--ochre-deep)]"
+          >
+            {expanded ? "Show Less" : "Explore Full Collection"}
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
