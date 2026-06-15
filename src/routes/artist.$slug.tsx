@@ -20,21 +20,19 @@ function artworksQueryOptions(slug: string) {
 
 /* ---------- Route ---------- */
 export const Route = createFileRoute("/artist/$slug")({
-  head: ({ loaderData }) => {
-    const artist = loaderData?.artist;
-    const seo = (artist?.seo ?? {}) as Record<string, string>;
-    const images = (artist?.images ?? {}) as Record<string, string>;
+  head: ({ params }) => {
+    const name = params.slug
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
     return {
       meta: [
-        { title: seo.title || `${artist?.name} — Artist` },
-        { name: "description", content: seo.description || "" },
-        { name: "keywords", content: seo.keywords || "" },
-        { property: "og:title", content: seo.og_title || "" },
-        { property: "og:description", content: seo.og_description || "" },
+        { title: `${name} — Artist` },
+        { name: "description", content: `Discover ${name}, contemporary artist. Explore biography, exhibitions, education and studio practice.` },
+        { property: "og:title", content: `${name} — Artist` },
+        { property: "og:description", content: `Explore the work and studio practice of ${name}.` },
         { property: "og:type", content: "profile" },
-        { property: "og:image", content: images.portrait || "" },
         { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:image", content: images.portrait || "" },
       ],
     };
   },
