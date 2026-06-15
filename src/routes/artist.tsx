@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import portrait from "@/assets/priya-portrait.jpg";
 import heroBg from "@/assets/artist-hero-bg.jpg";
 import studioWide from "@/assets/studio-wide.jpg";
@@ -71,6 +72,7 @@ function ArtistPage() {
       <Information />
       <Studio />
       <Exhibitions />
+      <ArtworkForSale />
     </main>
   );
 }
