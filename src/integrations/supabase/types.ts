@@ -14,7 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      artists: {
+        Row: {
+          accolades: Json
+          artwork_for_sale_subtitle: string | null
+          artwork_for_sale_title: string | null
+          bio_paragraphs: Json
+          city: string
+          created_at: string
+          education: Json
+          exhibitions_group: Json
+          exhibitions_solo: Json
+          id: string
+          images: Json
+          is_published: boolean
+          job_title: string
+          movement: string
+          name: string
+          nationality: string | null
+          seo: Json
+          slug: string
+          stats: Json
+          studio_quote: string | null
+          studio_quote_author: string | null
+          theme: Json
+          updated_at: string
+        }
+        Insert: {
+          accolades?: Json
+          artwork_for_sale_subtitle?: string | null
+          artwork_for_sale_title?: string | null
+          bio_paragraphs?: Json
+          city: string
+          created_at?: string
+          education?: Json
+          exhibitions_group?: Json
+          exhibitions_solo?: Json
+          id?: string
+          images?: Json
+          is_published?: boolean
+          job_title?: string
+          movement: string
+          name: string
+          nationality?: string | null
+          seo?: Json
+          slug: string
+          stats?: Json
+          studio_quote?: string | null
+          studio_quote_author?: string | null
+          theme?: Json
+          updated_at?: string
+        }
+        Update: {
+          accolades?: Json
+          artwork_for_sale_subtitle?: string | null
+          artwork_for_sale_title?: string | null
+          bio_paragraphs?: Json
+          city?: string
+          created_at?: string
+          education?: Json
+          exhibitions_group?: Json
+          exhibitions_solo?: Json
+          id?: string
+          images?: Json
+          is_published?: boolean
+          job_title?: string
+          movement?: string
+          name?: string
+          nationality?: string | null
+          seo?: Json
+          slug?: string
+          stats?: Json
+          studio_quote?: string | null
+          studio_quote_author?: string | null
+          theme?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      artworks: {
+        Row: {
+          artist_id: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_sold: boolean
+          medium: string
+          name: string
+          palette: Json
+          price: number
+          sort_order: number
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_sold?: boolean
+          medium: string
+          name: string
+          palette?: Json
+          price: number
+          sort_order?: number
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_sold?: boolean
+          medium?: string
+          name?: string
+          palette?: Json
+          price?: number
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artworks_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
