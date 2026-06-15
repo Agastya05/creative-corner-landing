@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;700&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -19,6 +20,14 @@
  */
 
 @theme inline {
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-italic: "Cormorant Garamond", Georgia, serif;
+  --color-ochre: var(--ochre);
+  --color-ochre-deep: var(--ochre-deep);
+  --color-ochre-soft: var(--ochre-soft);
+  --color-ink: var(--ink);
+  --color-cream: var(--cream);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -63,6 +72,11 @@
 
 :root {
   --radius: 0.625rem;
+  --ochre: oklch(0.78 0.155 80);
+  --ochre-deep: oklch(0.62 0.145 70);
+  --ochre-soft: oklch(0.92 0.07 90);
+  --ink: oklch(0.18 0.03 80);
+  --cream: oklch(0.97 0.025 90);
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
@@ -141,4 +155,9 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
