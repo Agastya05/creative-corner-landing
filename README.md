@@ -1,6 +1,6 @@
 # AR.02 Artist Platform — Frontend Handoff Document
 
-> **For the backend team:** This project is designed to be framework-agnostic. All business logic, data fetching, and UI components live in plain React files with **zero** TanStack Start or Supabase lock-in. The thin routing shell in `src/routes/` is the only TanStack-specific layer and is trivial to replace.
+> **For the backend team:** This project is designed to be framework-agnostic. All business logic, data fetching, and UI components live in plain React files with **zero** TanStack Start or Supabase lock-in. The thin routing shell in `src/routes/` is the only TanStack-specific layer and is trivial to replace. The project has been fully migrated to **JavaScript**.
 
 ---
 
@@ -24,7 +24,7 @@
 
 **AR.02** is a contemporary art platform showcasing artists and their work. The current build features a rich artist profile page with biography, studio photography, exhibition history, and an artwork catalog.
 
-- **Frontend framework:** React 19 + TypeScript + Tailwind CSS v4
+- **Frontend framework:** React 19 + JavaScript + Tailwind CSS v4
 - **Current shell:** TanStack Start (file-based routing, SSR)
 - **Target stack:** Plain Vite SPA + React Router DOM
 - **Data layer:** Swappable adapter (mock ↔ REST)
@@ -38,7 +38,7 @@ The codebase follows a **shell-and-core** pattern:
 
 | Layer | Purpose | Framework Lock-in |
 |-------|---------|------------------|
-| **Shell** (`src/routes/*.tsx`) | URL routing, meta tags, param extraction | TanStack Start only |
+| **Shell** (`src/routes/*.jsx`) | URL routing, meta tags, param extraction | TanStack Start only |
 | **Core** (`src/pages/`, `src/components/`, `src/lib/api/`) | All UI, data fetching, business logic | **Zero** — plain React |
 
 **This means:** When you migrate to your own stack, you only replace the shell. All the real code — components, hooks, API logic, styles — copies over unchanged.
@@ -47,7 +47,7 @@ The codebase follows a **shell-and-core** pattern:
 
 ## 3. Folder Structure
 
-```
+```text
 ├── public/                      # Static assets (images, fonts, favicon)
 │   ├── artist-hero-bg.jpg
 │   ├── priya-portrait.jpg
@@ -56,31 +56,31 @@ The codebase follows a **shell-and-core** pattern:
 │
 ├── src/
 │   ├── components/ui/           # shadcn/ui primitives (Button, Card, Dialog, etc.)
-│   │   └── button.tsx
+│   │   └── button.jsx
 │   │   └── ...
 │   │
 │   ├── lib/
 │   │   └── api/                 # ← THE IMPORTANT PART
-│   │       ├── types.ts         # Artist, Artwork interfaces (source of truth)
-│   │       ├── mock-adapter.ts  # Hardcoded data for local dev
-│   │       ├── rest-adapter.ts  # Generic fetch() to your API
-│   │       └── index.ts         # One-line switch: mock vs REST
+│   │       ├── types.js         # Artist, Artwork objects documentation
+│   │       ├── mock-adapter.js  # Hardcoded data for local dev
+│   │       ├── rest-adapter.js  # Generic fetch() to your API
+│   │       └── index.js         # One-line switch: mock vs REST
 │   │
 │   ├── pages/
-│   │   └── ArtistPage.tsx       # Plain React page. All artist UI lives here.
+│   │   └── ArtistPage.jsx       # Plain React page. All artist UI lives here.
 │   │                              # Uses useEffect + useState. No loaders. No SSR.
 │   │
 │   ├── routes/                  # ← TANSTACK SHELL ONLY (replaceable)
-│   │   ├── __root.tsx           # Root layout (html/head/body shell)
-│   │   ├── index.tsx            # Homepage route
-│   │   └── artist.$slug.tsx     # Artist page route (30 lines, passes slug to ArtistPage)
+│   │   ├── __root.jsx           # Root layout (html/head/body shell)
+│   │   ├── index.jsx            # Homepage route
+│   │   └── artist.$slug.jsx     # Artist page route (30 lines, passes slug to ArtistPage)
 │   │
 │   ├── styles.css               # Tailwind v4 setup + design tokens (colors, fonts)
 │   └── ...
 │
 ├── API-SPEC.md                  # Full JSON contract for your backend
-├── vite.config.ts               # Vite + TanStack plugins (replace with plain Vite config)
-├── tsconfig.json                # Path aliases: `@/` → `src/`
+├── vite.config.js               # Vite + TanStack plugins (replace with plain Vite config)
+├── jsconfig.json                # Path aliases: `@/` → `src/`
 └── package.json
 ```
 
@@ -95,7 +95,7 @@ When migrating, copy these directories **as-is**:
 
 **Do NOT copy:**
 - `src/routes/` — replace with your router (React Router, etc.)
-- `vite.config.ts` — create a fresh Vite config
+- `vite.config.js` — create a fresh Vite config
 
 ---
 
@@ -105,8 +105,8 @@ The frontend decides at runtime whether to use mock data or call your API. This 
 
 ### How it works
 
-```typescript
-// src/lib/api/index.ts
+```javascript
+// src/lib/api/index.js
 const baseUrl = import.meta.env.VITE_API_BASE_URL; // undefined = mock mode
 
 export const artistApi = baseUrl
@@ -123,8 +123,8 @@ export const artistApi = baseUrl
 
 Components are completely agnostic to which adapter is active:
 
-```typescript
-// src/pages/ArtistPage.tsx
+```javascript
+// src/pages/ArtistPage.jsx
 import { artistApi } from "@/lib/api";
 
 useEffect(() => {
@@ -148,57 +148,57 @@ See **`API-SPEC.md`** in the project root for the complete specification. Here i
 | `GET` | `/artists/:slug` | Single `Artist` object (JSON) |
 | `GET` | `/artists/:slug/artworks` | Array of `Artwork` objects (JSON) |
 
-### TypeScript types (source of truth)
+### Expected JSON shapes (source of truth)
 
-```typescript
-// src/lib/api/types.ts
-
-export interface Artist {
-  slug: string;
-  name: string;
-  city: string;
-  movement: string;
-  job_title: string;
-  nationality: string;
-  bio_paragraphs: string[];          // may contain inline HTML
+```javascript
+// Expected Artist object shape
+{
+  slug: "string",
+  name: "string",
+  city: "string",
+  movement: "string",
+  job_title: "string",
+  nationality: "string",
+  bio_paragraphs: ["string"],          // may contain inline HTML
   stats: {
-    based_in: string;
-    practice: string;
-    exhibitions: string;
-    years_active: string;
-  };
-  education: Array<{ degree: string; school: string; year: string }>;
-  accolades: Array<{ name: string; category: string; year: string }>;
-  exhibitions_solo: Array<{ name: string; venue: string; date: string }>;
-  exhibitions_group: Array<{ name: string; venue: string; date: string }>;
-  theme: { bg: string; text: string; cream: string; accent: string };
+    based_in: "string",
+    practice: "string",
+    exhibitions: "string",
+    years_active: "string"
+  },
+  education: [{ degree: "string", school: "string", year: "string" }],
+  accolades: [{ name: "string", category: "string", year: "string" }],
+  exhibitions_solo: [{ name: "string", venue: "string", date: "string" }],
+  exhibitions_group: [{ name: "string", venue: "string", date: "string" }],
+  theme: { bg: "string", text: "string", cream: "string", accent: "string" },
   images: {
-    hero_bg: string;          // publicly fetchable URL
-    portrait: string;
-    studio_wide: string;
-    studio_hands: string;
-    studio_flatlay: string;
-  };
+    hero_bg: "string",          // publicly fetchable URL
+    portrait: "string",
+    studio_wide: "string",
+    studio_hands: "string",
+    studio_flatlay: "string"
+  },
   seo: {
-    title: string;
-    description: string;
-    keywords: string;
-    og_title: string;
-    og_description: string;
-  };
-  studio_quote: string;
-  studio_quote_author: string;
-  artwork_for_sale_title: string;
-  artwork_for_sale_subtitle: string;
+    title: "string",
+    description: "string",
+    keywords: "string",
+    og_title: "string",
+    og_description: "string"
+  },
+  studio_quote: "string",
+  studio_quote_author: "string",
+  artwork_for_sale_title: "string",
+  artwork_for_sale_subtitle: "string"
 }
 
-export interface Artwork {
-  id: string;
-  name: string;
-  medium: string;
-  price: number;              // integer in local currency
-  palette: [string, string];  // exactly two hex colors
-  image_url: string | null;   // null → frontend renders gradient
+// Expected Artwork object shape
+{
+  id: "string",
+  name: "string",
+  medium: "string",
+  price: 1000,                // integer in local currency
+  palette: ["#hex1", "#hex2"],// exactly two hex colors
+  image_url: "string" | null  // null → frontend renders gradient
 }
 ```
 
@@ -220,7 +220,7 @@ This is a ~15 minute mechanical migration. No business logic needs rewriting.
 ### Step 1: Scaffold a new Vite project
 
 ```bash
-npm create vite@latest my-art-platform -- --template react-ts
+npm create vite@latest my-art-platform -- --template react
 cd my-art-platform
 npm install
 ```
@@ -241,19 +241,19 @@ npm install class-variance-authority clsx tailwind-merge lucide-react
 ### Step 3: Copy portable code
 
 ```bash
-# From the Lovable project, copy these directories:
-cp -r ../lovable-project/src/components ./src/
-cp -r ../lovable-project/src/lib ./src/
-cp -r ../lovable-project/src/pages ./src/
-cp ../lovable-project/src/styles.css ./src/
-cp -r ../lovable-project/public/* ./public/
+# From the project, copy these directories:
+cp -r ../creative-corner-landing/src/components ./src/
+cp -r ../creative-corner-landing/src/lib ./src/
+cp -r ../creative-corner-landing/src/pages ./src/
+cp ../creative-corner-landing/src/styles.css ./src/
+cp -r ../creative-corner-landing/public/* ./public/
 ```
 
 ### Step 4: Create a fresh Vite config
 
-Replace `vite.config.ts` with a plain Vite + React + Tailwind setup:
+Replace `vite.config.js` with a plain Vite + React + Tailwind setup:
 
-```typescript
+```javascript
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -271,14 +271,14 @@ export default defineConfig({
 
 ### Step 5: Replace TanStack routes with React Router
 
-**Create `src/App.tsx`:**
+**Create `src/App.jsx`:**
 
-```tsx
+```jsx
 import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
 import ArtistPage from "@/pages/ArtistPage";
 
 function ArtistRoute() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams();
   if (!slug) return <div>Missing slug</div>;
   return <ArtistPage slug={slug} />;
 }
@@ -295,15 +295,15 @@ export default function App() {
 }
 ```
 
-**Update `src/main.tsx`:**
+**Update `src/main.jsx`:**
 
-```tsx
+```jsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./styles.css";
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <App />
   </StrictMode>
@@ -322,7 +322,7 @@ Create `.env` in project root:
 VITE_API_BASE_URL=https://api.yourdomain.com
 ```
 
-In a plain Vite app, use `import.meta.env.VITE_API_BASE_URL` — it's already used in `src/lib/api/index.ts`.
+In a plain Vite app, use `import.meta.env.VITE_API_BASE_URL` — it's already used in `src/lib/api/index.js`.
 
 ### Step 7: Update `index.html`
 
@@ -338,7 +338,7 @@ Ensure `index.html` has a root div:
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
 ```
@@ -381,7 +381,7 @@ The project uses **Tailwind CSS v4** with custom design tokens defined in `src/s
 
 ### Font loading
 
-The page expects these Google Fonts (loaded in `__root.tsx` or your HTML shell):
+The page expects these Google Fonts (loaded in `__root.jsx` or your HTML shell):
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -403,7 +403,7 @@ The page expects these Google Fonts (loaded in `__root.tsx` or your HTML shell):
 
 | Component | File | Description |
 |-----------|------|-------------|
-| `ArtistPage` | `ArtistPage.tsx` | Full artist profile page. Accepts `slug: string` prop. Fetches data via `artistApi`. Contains Hero, Bio, Studio, Exhibitions, and Artwork Catalog sections. |
+| `ArtistPage` | `ArtistPage.jsx` | Full artist profile page. Accepts `slug` prop. Fetches data via `artistApi`. Contains Hero, Bio, Studio, Exhibitions, and Artwork Catalog sections. |
 
 ### shadcn/ui primitives (`src/components/ui/`)
 
@@ -472,22 +472,21 @@ Follow the [Migration Guide](#6-migration-guide-tanstack-start--plain-vite-spa) 
 
 ### Styles look wrong after migration
 - Ensure `src/styles.css` is imported in your entry file.
-- Ensure Tailwind CSS v4 is properly configured in `vite.config.ts`.
+- Ensure Tailwind CSS v4 is properly configured in `vite.config.js`.
 - Verify Google Fonts (Playfair Display, Cormorant Garamond) are loaded.
 
-### TypeScript path alias `@/` not resolving
-- Ensure your `vite.config.ts` has the `resolve.alias` config (see Step 4).
-- Ensure `tsconfig.json` has `"baseUrl": "."` and `"paths": { "@/*": ["./src/*"] }`.
+### Path alias `@/` not resolving
+- Ensure your `vite.config.js` has the `resolve.alias` config (see Step 4).
+- Ensure `jsconfig.json` has `"baseUrl": "."` and `"paths": { "@/*": ["./src/*"] }`.
 
 ---
 
 ## Contact & Questions
 
 - **API contract questions?** → See `API-SPEC.md`
-- **Type definitions?** → See `src/lib/api/types.ts`
-- **Adapter logic?** → See `src/lib/api/index.ts`
-- **UI questions?** → See `src/pages/ArtistPage.tsx` (all UI is in one file)
+- **Adapter logic?** → See `src/lib/api/index.js`
+- **UI questions?** → See `src/pages/ArtistPage.jsx` (all UI is in one file)
 
 ---
 
-*Last updated: 2025-06-15*
+*Last updated: 2026-06-20*
